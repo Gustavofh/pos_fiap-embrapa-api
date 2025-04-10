@@ -1,0 +1,40 @@
+name: PR on Develop Branch
+
+on:
+  pull_request:
+    branches: ["develop"]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.11"
+      - name: Install packages
+        run: |
+          python -m pip install -- upgrade pip
+          pip install -r requirements.txt
+      - name: Run unit tests
+        run: |
+          echo 'There is no unittests yet'
+      #    tests/leiloes_caixa_tests/preprocessing_tests/test_functions.py
+      - name: Run coverage
+        run: |
+          echo 'There is no unittests yet'
+      #    coverage run --source=my_project --omit='*/__init__.py,*test*,*utils*,*dbs*,*.json,*notification*,*/spark_session.py,*/processing_job_spark.py,*/queries.py,*/big_queries_db.py,*/chromeDriver.py,*/preprocessing_job.py,*dataframe_job.py' -m pytest
+      # - name: Generate Coverage Report
+      #   run: |
+      #     coverage report -m
+      #     coverage html
+      #     coverage xml
+      #     coverage report --fail-under=80
+      # - name: Upload coverage report
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: coverage-report
+      #     path: htmlcov
+        env:
+          CI: true
