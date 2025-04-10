@@ -1,0 +1,22 @@
+name: PR on Master Branch
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Verify branch
+      run: |
+        if [[ "${{ github.event.pull_request.head.ref }}" != "develop" ]]; then
+          echo "Pull request not opened from develop branch. Exiting."
+          exit 1
+        fi
+      shell: bash
+    - name: Finish
+      run: |
+        echo "Success!"
