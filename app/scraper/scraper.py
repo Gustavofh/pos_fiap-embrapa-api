@@ -1,4 +1,5 @@
 import requests
+import numpy as np
 from bs4 import BeautifulSoup
 import pandas as pd
 from unidecode import unidecode
@@ -19,7 +20,7 @@ class EmbrapaScraper:
             "categoria": "producao",
             "classificacao": None,
             "key_column": "produto",
-            "column_names": ["cultivar", "quantidade_kg", "tipo", "ano", "categoria", "classificacao"],
+            "column_names": ["produto", "quantidade_l", "tipo", "ano", "categoria", "classificacao"],
         },
         {
             "url": "opcao=opt_03&subopcao=subopt_01",
@@ -234,7 +235,7 @@ class EmbrapaScraper:
                             new_row["tipo"] = unidecode(current_type.lower()).replace(" ", "_")
 
                         # Adiciona colunas extras
-                        new_row["ano"] = ano
+                        new_row["ano"] = str(ano)
                         new_row["categoria"] = cat
                         new_row["classificacao"] = classificacao
 
@@ -253,6 +254,10 @@ class EmbrapaScraper:
         print(rename_map)
         df_final.rename(columns=rename_map, inplace=True)
         df_final = df_final[table_new_cols].reset_index(drop=True)
-
+        
+        for col in df_final.columns:
+            df_final[col] = df_final[col].replace('-', np.nan)
+            df_final[col] = df_final[col].replace('.', '')
+        
         return df_final
 

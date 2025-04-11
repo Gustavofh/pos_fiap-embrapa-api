@@ -40,7 +40,7 @@ class BigQueryConnector:
         print(f"[BIGQUERY] Tabela '{table_ref}' carregada com {len(df)} linhas.\n")
     
     
-    def execute_query(self, query: str, data):
+    async def execute_query(self, query: str):
         """
         Executa uma query no BigQuery utilizando parâmetros opcionais.
         
