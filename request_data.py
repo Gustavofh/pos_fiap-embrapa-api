@@ -19,6 +19,6 @@ for key in KEY_COLS:
     df_result['valor_dol'] = df_result['valor_dol'].str.replace('.', '').replace('nd', np.nan).replace('*', np.nan).astype('float')
     df_result['ano'] = df_result['ano'].astype('str')
     df_result['categoria'] = df_result['categoria'].astype('str')
-    df_result['classificacao'] = df_result['classificacao'].astype('str')
+    df_result['caracteristica'] = df_result['caracteristica'].astype('str')
     
     bq_loader.load_dataframe_to_bigquery(df_result, key)
