@@ -13,6 +13,11 @@ scraper = EmbrapaScraper()
 
 @router.get("", response_model=List[ProcessamentoBase])
 async def get_processamento(
+        cultivar: List[str] = Query([], description="Cultivar(s) a ser coletado"),
+        tipo: List[str] = Query([], description="Tipo(s) a ser coletado"),
+        caracteristica: List[str] = Query([], description="Característica(s) a ser coletada"),
+        quantidadeMinima: int = Query(None, description="Quantidade mínima a ser coletada"),
+        quantidadeMaxima: int = Query(None, description="Quantidade máxima a ser coletada"),
         ano: List[int] = Query(list(range(1970, 2025)), description="Repita o parâmetro para cada ano")
 ):
     URL = "http://vitibrasil.cnpuv.embrapa.br/index.php"
@@ -28,14 +33,14 @@ async def get_processamento(
 
     scraper = EmbrapaScraper()
     df = pd.DataFrame(columns=['cultivar', 'quantidade_kg', 'tipo', 'caracteristica', 'ano'])
-    for tipo, url in types.items():
+    for type, url in types.items():
         df_aux = create_dataframe(
             scraper=scraper,
             url=url,
             main_cols=config["main_cols"],
             numeric_cols=config["numeric_cols"],
             anos=ano,
-            tipo=tipo,
+            tipo=type,
             caracteristica=True
         )
         df = pd.concat([df, df_aux], ignore_index=True)
@@ -43,6 +48,17 @@ async def get_processamento(
     if df.empty:
         anos_str = ", ".join(map(str, ano))
         raise HTTPException(404, f"Nenhum dado encontrado para o(s) ano(s): {anos_str}")
+
+    if cultivar:
+        df = df[df["produto"].isin(cultivar)]
+    if tipo:
+        df = df[df["produto"].isin(tipo)]
+    if caracteristica:
+        df = df[df["produto"].isin(caracteristica)]
+    if quantidadeMinima:
+        df = df.loc[df["quantidade_kg"] >= quantidadeMinima]
+    if quantidadeMaxima:
+        df = df[df["quantidade_kg"] <= quantidadeMaxima]
 
     rows = (
         df.where(pd.notnull(df), None)

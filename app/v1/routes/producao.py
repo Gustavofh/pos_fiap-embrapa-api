@@ -13,6 +13,10 @@ scraper = EmbrapaScraper()
 
 @router.get("", response_model=List[ProducaoOut])
 async def get_producao(
+        produto: List[str] = Query([], description="Produto(s) a ser coletado"),
+        tipo: List[str] = Query([], description="Tipo(s) a ser coletado"),
+        quantidadeMinima: int = Query(None, description="Quantidade mínima a ser coletada"),
+        quantidadeMaxima: int = Query(None, description="Quantidade máxima a ser coletada"),
         ano: List[int] = Query(list(range(1970, 2025)), description="Repita o parâmetro para cada ano")
 ):
     URL = "http://vitibrasil.cnpuv.embrapa.br/index.php"
@@ -33,12 +37,17 @@ async def get_producao(
         anos_str = ", ".join(map(str, ano))
         raise HTTPException(404, f"Nenhum dado encontrado para o(s) ano(s): {anos_str}")
 
+    if produto:
+        df = df[df["produto"].isin(produto)]
+    if tipo:
+        df = df[df["produto"].isin(tipo)]
+    if quantidadeMinima:
+        df = df.loc[df["quantidade_l"] >= quantidadeMinima]
+    if quantidadeMaxima:
+        df = df[df["quantidade_l"] <= quantidadeMaxima]
+
     rows = (
         df.where(pd.notnull(df), None)
           .to_dict(orient="records")
     )
     return rows
-
-
-
-

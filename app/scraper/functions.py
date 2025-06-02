@@ -36,6 +36,9 @@ def create_dataframe(
                 raw_data[col]
                 .str.replace(".", "", regex=False)
                 .replace("-", np.nan)
+                .replace("nd", np.nan)
+                .replace("*", np.nan)
+                .astype(float)
             )
         raw_data = raw_data.dropna(subset=numeric_cols, how="all")
         if raw_data.empty:

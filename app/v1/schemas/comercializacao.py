@@ -2,10 +2,9 @@ from pydantic import BaseModel
 
 
 class ComercializacaoBase(BaseModel):
-    cultivar: str
-    quantidade_kg: int
+    produto: str
+    quantidade_l: int
     tipo: str
-    caracteristica: str
     ano: str
 
 
