@@ -4,13 +4,14 @@ from typing import List
 
 from app.scraper.functions import create_dataframe
 from app.scraper.scraper import EmbrapaScraper
+from app.v1.schemas.processamento import ProcessamentoBase
 
 router = APIRouter(prefix="/processamento", tags=["Processamento"])
 
 scraper = EmbrapaScraper()
 
 
-@router.get("")
+@router.get("", response_model=List[ProcessamentoBase])
 async def get_processamento(
         ano: List[int] = Query([2023], description="Repita o parâmetro para cada ano")
 ):

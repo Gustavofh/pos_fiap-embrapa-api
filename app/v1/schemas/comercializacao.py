@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 
-class ProcessamentoBase(BaseModel):
+class ComercializacaoBase(BaseModel):
     cultivar: str
     quantidade_kg: int
     tipo: str
@@ -9,6 +9,7 @@ class ProcessamentoBase(BaseModel):
     ano: str
 
 
-class ProcessamentoOut(ProcessamentoBase):
+class ComercializacaoOut(ComercializacaoBase):
     pass
+
 
