@@ -13,7 +13,7 @@ scraper = EmbrapaScraper()
 
 @router.get("", response_model=List[ImportacaoOut])
 async def get_processamento(
-        ano: List[int] = Query([2024], description="Repita o parâmetro para cada ano")
+        ano: List[int] = Query(list(range(1970, 2025)), description="Repita o parâmetro para cada ano")
 ):
     URL = "http://vitibrasil.cnpuv.embrapa.br/index.php"
     config = {
