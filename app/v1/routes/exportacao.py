@@ -5,7 +5,7 @@ from typing import List
 from app.scraper.functions import create_dataframe
 from app.scraper.scraper import EmbrapaScraper
 
-router = APIRouter(prefix="/processamento", tags=["Processamento"])
+router = APIRouter(prefix="/exportacao", tags=["Exportacao"])
 
 scraper = EmbrapaScraper()
 
@@ -16,17 +16,18 @@ async def get_processamento(
 ):
     URL = "http://vitibrasil.cnpuv.embrapa.br/index.php"
     config = {
-        "main_cols": "cultivar",
-        "numeric_cols": ['quantidade_kg']
+        "main_cols": "paises",
+        "numeric_cols": ['quantidade_kg', "valor_dolar"]
     }
     types = {
-        "vinifera": f'{URL}?opcao=opt_03&subopcao=subopt_01',
-        "americanas_e_hibridas": f'{URL}?opcao=opt_03&subopcao=subopt_02',
-        "uvas_de_mesa": f'{URL}?opcao=opt_03&subopcao=subopt_03',
+        "vinhos_de_mesa": f'{URL}?opcao=opt_06&subopcao=subopt_01',
+        "espumantes": f'{URL}?opcao=opt_06&subopcao=subopt_02',
+        "uvas_frescas": f'{URL}?opcao=opt_06&subopcao=subopt_03',
+        "suco_de_uva": f'{URL}?opcao=opt_06&subopcao=subopt_04',
     }
 
     scraper = EmbrapaScraper()
-    df = pd.DataFrame(columns=['cultivar', 'quantidade_kg', 'tipo', 'caracteristica', 'ano'])
+    df = pd.DataFrame(columns=['paises', 'quantidade_kg', 'valor_dolar', 'tipo', 'ano'])
     for tipo, url in types.items():
         print(url)
         df_aux = create_dataframe(
@@ -35,8 +36,7 @@ async def get_processamento(
             main_cols=config["main_cols"],
             numeric_cols=config["numeric_cols"],
             anos=ano,
-            tipo=tipo,
-            caracteristica=True
+            tipo=tipo
         )
         df = pd.concat([df, df_aux], ignore_index=True)
 

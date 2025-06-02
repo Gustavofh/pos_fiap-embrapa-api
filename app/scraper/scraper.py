@@ -1,9 +1,9 @@
-import requests
-import numpy as np
-from bs4 import BeautifulSoup
+from typing import List, Optional
+
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 from unidecode import unidecode
-from typing import List, Optional, Dict, Any
 
 
 class EmbrapaScraper:
@@ -47,9 +47,9 @@ class EmbrapaScraper:
 
     def extract_data(self) -> pd.DataFrame:
         """
-        Extrai dados da tabela class='tb_base tb_dados' em um BeautifulSoup e retorna um DataFrame.
-        :param soup: Objeto BeautifulSoup contendo a página.
-        :return: DataFrame com o conteúdo da tabela, ou vazio se nada for encontrado.
+        Extrai dados da tabela class='tb_base tb_dados' em um BeautifulSoup e
+        retorna um DataFrame. Ajusta para lidar com páginas que têm apenas linhas simples
+        (sem classes 'tb_item' ou 'tb_subitem'), como importação/exportação.
         """
         table_soup = self.soup.find('table', {'class': 'tb_base tb_dados'})
         if not table_soup:
@@ -62,8 +62,8 @@ class EmbrapaScraper:
         col_names: List[str] = []
         for row in thead.find_all('tr'):
             data_cols = [
-                unidecode(th.get_text(strip=True).lower()).replace(" ", "_").replace("(", "").replace(")", "").replace(
-                    ".", "")
+                unidecode(th.get_text(strip=True).lower())
+                .replace(" ", "_").replace("(", "").replace(")", "").replace(".", "")
                 for th in row.find_all('th')
             ]
             col_names.extend(data_cols)
@@ -73,11 +73,53 @@ class EmbrapaScraper:
             return pd.DataFrame(columns=col_names)
 
         rows_data: List[List[str]] = []
-        for row in tbody.find_all('tr'):
-            cols = [td.get_text(strip=True) for td in row.find_all('td')]
-            if len(cols) > 1:
-                cols[0] = unidecode(cols[0]).replace(" ", "_")
-                rows_data.append(cols)
+        current_item: str | None = None
+        skip_item_row = False
 
-        df = pd.DataFrame(rows_data, columns=col_names)
+        trs = tbody.find_all('tr')
+        i = 0
+        while i < len(trs):
+            row = trs[i]
+            tds = row.find_all('td')
+
+            if not tds[0].get("class"):
+                cols = [td.get_text(strip=True).replace(".", "").replace(",", "") for td in tds]
+                rows_data.append(cols)
+            else:
+                if len(tds) > 1:
+                    raw_nome = tds[0].get_text(strip=True)
+                    raw_qtd = tds[1].get_text(strip=True)
+                    nome_fmt = unidecode(raw_nome).replace(" ", "_").lower()
+                    td_classes = tds[0].get("class", [])
+
+                    if "tb_item" in td_classes:
+                        current_item = nome_fmt
+
+                        skip_item_row = False
+                        if i + 1 < len(trs):
+                            next_td_classes = trs[i + 1].find_all('td')[0].get("class", [])
+                            if "tb_subitem" in next_td_classes:
+                                skip_item_row = True
+
+                        if not skip_item_row:
+                            row_list: List[str] = [nome_fmt, raw_qtd, current_item]
+                            rows_data.append(row_list)
+
+                    elif "tb_subitem" in td_classes:
+                        row_list: List[str] = [nome_fmt, raw_qtd, current_item]
+                        rows_data.append(row_list)
+
+            i += 1
+
+        if rows_data and not trs[0].find_all('td')[0].get("class"):
+            df = pd.DataFrame(rows_data, columns=col_names)
+        else:
+            final_cols = col_names + ["__item"]
+            df = pd.DataFrame(rows_data, columns=final_cols)
+
+        if 'valor_us$' in df.columns:
+            df = df.rename(columns={'valor_us$': 'valor_dolar'})
+
+        print(df)
         return df
+
