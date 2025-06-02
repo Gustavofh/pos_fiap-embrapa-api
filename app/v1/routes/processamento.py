@@ -29,7 +29,6 @@ async def get_processamento(
     scraper = EmbrapaScraper()
     df = pd.DataFrame(columns=['cultivar', 'quantidade_kg', 'tipo', 'caracteristica', 'ano'])
     for tipo, url in types.items():
-        print(url)
         df_aux = create_dataframe(
             scraper=scraper,
             url=url,

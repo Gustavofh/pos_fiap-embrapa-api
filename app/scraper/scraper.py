@@ -119,7 +119,5 @@ class EmbrapaScraper:
 
         if 'valor_us$' in df.columns:
             df = df.rename(columns={'valor_us$': 'valor_dolar'})
-
-        print(df)
         return df
 

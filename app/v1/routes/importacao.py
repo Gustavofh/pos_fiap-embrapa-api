@@ -31,7 +31,6 @@ async def get_importacao(
     scraper = EmbrapaScraper()
     df = pd.DataFrame(columns=['paises', 'quantidade_kg', 'valor_dolar', 'tipo', 'ano'])
     for tipo, url in types.items():
-        print(url)
         df_aux = create_dataframe(
             scraper=scraper,
             url=url,

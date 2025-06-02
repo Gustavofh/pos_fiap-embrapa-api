@@ -66,10 +66,4 @@ def create_dataframe(
 
         df = pd.concat([df, raw_data], ignore_index=True)
 
-        logging.info(f"Coletando dados do ano {ano}")
-        print(f"Coletando dados do ano {ano}")
-        if tipo:
-            logging.info(f"Coletando dados para o tipo {tipo}\n")
-            print(f"Coletando dados para o tipo {tipo}\n")
-
     return df
