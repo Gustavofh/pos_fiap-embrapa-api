@@ -68,7 +68,6 @@ def get_exportacoes(
 
     if paises:
         query = query.filter(Exportacao.paises.in_(paises))
-
     if tipos:
         query = query.filter(Exportacao.tipo.in_(tipos))
     if quantidade_minima is not None:
