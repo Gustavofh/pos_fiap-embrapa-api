@@ -14,7 +14,7 @@ from app.scraper.functions import create_dataframe
 from app.scraper.scraper import EmbrapaScraper
 from app.v1.schemas.exportacao import ExportacaoBase, ExportacaoOut
 
-router = APIRouter(prefix="/exportacao", tags=["Exportacao"])
+router = APIRouter(prefix="/exportacao", tags=["Exportação"])
 scraper = EmbrapaScraper()
 
 
