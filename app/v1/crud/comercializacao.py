@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Type
 from sqlalchemy.orm import Session
 from app.v1.models.comercializacao import Comercializacao
 from app.v1.schemas.comercializacao import ComercializacaoBase
@@ -55,7 +55,7 @@ def get_comercializacoes(
     quantidade_minima: Optional[int] = None,
     quantidade_maxima: Optional[int] = None,
     anos: Optional[List[int]] = None,
-) -> List[Comercializacao]:
+) -> list[Type[Comercializacao]]:
     """
     Retorna todos os registros que atendem aos filtros fornecidos.
     Se um parâmetro for None ou lista vazia, esse filtro é ignorado.

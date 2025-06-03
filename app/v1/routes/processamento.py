@@ -77,13 +77,14 @@ def update_processamento(
         )
         registros.append(item)
 
-    criados = create_processamentos(db=db, registros=registros)
-    return criados
+    dados = create_processamentos(db=db, registros=registros)
+    return dados
 
 
 @router.get(
     "",
-    response_model=List[ProcessamentoOut]
+    response_model=List[ProcessamentoOut],
+    status_code=status.HTTP_200_OK
 )
 def read_processamentos(
     cultivar: Optional[List[str]] = Query([], description="Cultivar(es) para filtrar"),
@@ -101,7 +102,7 @@ def read_processamentos(
     """
     filtros_anos = ano if ano else None
 
-    registros = crud_get_processamentos(
+    dados = crud_get_processamentos(
         db=db,
         cultivares=cultivar or None,
         tipos=tipo or None,
@@ -110,7 +111,12 @@ def read_processamentos(
         quantidade_maxima=quantidadeMaxima,
         anos=filtros_anos
     )
-    return registros
+    if len(dados) != 0:
+        return dados
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Registros não encontrados. Altere os parametros de filtro."
+    )
 
 
 @router.post(
@@ -127,5 +133,5 @@ def create_processamento_manual(
     - Recebe manualmente (JSON) um registro ProcessamentoBase e insere no banco.
     - Retorna o registro criado (com id).
     """
-    criado = crud_create_processamento(db=db, registro=registro)
-    return criado
+    dados = crud_create_processamento(db=db, registro=registro)
+    return dados

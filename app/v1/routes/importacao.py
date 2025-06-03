@@ -76,13 +76,14 @@ def update_importacao(
         )
         registros.append(item)
 
-    criados = create_importacoes(db=db, importacoes=registros)
-    return criados
+    dados = create_importacoes(db=db, importacoes=registros)
+    return dados
 
 
 @router.get(
     "",
-    response_model=List[ImportacaoOut]
+    response_model=List[ImportacaoOut],
+    status_code=status.HTTP_200_OK
 )
 def read_importacoes(
     pais: Optional[List[str]] = Query([], description="País(es) para filtrar"),
@@ -101,7 +102,7 @@ def read_importacoes(
     """
     filtros_anos = ano if ano else None
 
-    registros = crud_get_importacoes(
+    dados = crud_get_importacoes(
         db=db,
         paises=pais or None,
         tipos=tipo or None,
@@ -111,8 +112,12 @@ def read_importacoes(
         valor_maximo=valorMaximo,
         anos=filtros_anos,
     )
-
-    return registros
+    if len(dados) != 0:
+        return dados
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Registros não encontrados. Altere os parametros de filtro."
+    )
 
 
 @router.post(
@@ -129,5 +134,5 @@ def create_importacao_manual(
     - Recebe manualmente (JSON) um registro ImportacaoBase e insere no banco.
     - Retorna o registro criado (com id).
     """
-    criado = crud_create_importacao(db=db, importacao=importacao)
-    return criado
+    dados = crud_create_importacao(db=db, importacao=importacao)
+    return dados

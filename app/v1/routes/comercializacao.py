@@ -1,6 +1,5 @@
 from typing import List, Optional
 
-import pandas as pd
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -66,13 +65,14 @@ def update_comercializacao(
         )
         registros.append(item)
 
-    criados = create_comercializacoes(db=db, registros=registros)
-    return criados
+    dados = create_comercializacoes(db=db, registros=registros)
+    return dados
 
 
 @router.get(
     "",
-    response_model=List[ComercializacaoOut]
+    response_model=List[ComercializacaoOut],
+    status_code=status.HTTP_200_OK
 )
 def read_comercializacoes(
     produto: Optional[List[str]] = Query([], description="Produto(s) para filtrar"),
@@ -89,7 +89,7 @@ def read_comercializacoes(
     """
     filtros_anos = ano if ano else None
 
-    registros = crud_get_comercializacoes(
+    dados = crud_get_comercializacoes(
         db=db,
         produtos=produto or None,
         tipos=tipo or None,
@@ -97,7 +97,12 @@ def read_comercializacoes(
         quantidade_maxima=quantidadeMaxima,
         anos=filtros_anos
     )
-    return registros
+    if len(dados) != 0:
+        return dados
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Registros não encontrados. Altere os parametros de filtro."
+    )
 
 
 @router.post(
@@ -114,5 +119,5 @@ def create_comercializacao_manual(
     - Recebe manualmente (JSON) um registro ComercializacaoBase e insere no banco.
     - Retorna o registro criado (com id).
     """
-    criado = crud_create_comercializacao(db=db, registro=registro)
-    return criado
+    dados = crud_create_comercializacao(db=db, registro=registro)
+    return dados

@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 import pandas as pd
+from unidecode import unidecode
 
 from app.scraper.scraper import EmbrapaScraper
 
@@ -49,7 +50,6 @@ def create_dataframe(
                 raw_data['tipo'] = tipo
             else:
                 raw_data['tipo'] = raw_data['__item']
-
             if caracteristica:
                 raw_data['caracteristica'] = raw_data['__item']
         else:
@@ -57,7 +57,6 @@ def create_dataframe(
                 raw_data['tipo'] = tipo
             else:
                 raw_data['tipo'] = None
-
             if caracteristica:
                 raw_data['caracteristica'] = None
 
@@ -68,5 +67,7 @@ def create_dataframe(
             raw_data = raw_data.drop(columns=['__item'])
 
         df = pd.concat([df, raw_data], ignore_index=True)
+        if "paises" in df.columns:
+            df["paises"] = df["paises"].apply(lambda x: unidecode(x).replace(" ", "_"))
 
     return df

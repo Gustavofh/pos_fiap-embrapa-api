@@ -76,13 +76,14 @@ def update_exportacao(
         )
         registros.append(item)
 
-    criados = create_exportacoes(db=db, registros=registros)
-    return criados
+    dados = create_exportacoes(db=db, registros=registros)
+    return dados
 
 
 @router.get(
     "",
-    response_model=List[ExportacaoOut]
+    response_model=List[ExportacaoOut],
+    status_code=status.HTTP_200_OK
 )
 def read_exportacoes(
     pais: Optional[List[str]] = Query([], description="País(es) para filtrar"),
@@ -101,7 +102,7 @@ def read_exportacoes(
     """
     filtros_anos = ano if ano else None
 
-    registros = crud_get_exportacoes(
+    dados = crud_get_exportacoes(
         db=db,
         paises=pais or None,
         tipos=tipo or None,
@@ -111,7 +112,12 @@ def read_exportacoes(
         valor_maximo=valorMaximo,
         anos=filtros_anos
     )
-    return registros
+    if len(dados) != 0:
+        return dados
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Registros não encontrados. Altere os parametros de filtro."
+    )
 
 
 @router.post(
@@ -128,5 +134,5 @@ def create_exportacao_manual(
     - Recebe manualmente (JSON) um registro ExportacaoBase e insere no banco.
     - Retorna o registro criado (com id).
     """
-    criado = crud_create_exportacao(db=db, registro=registro)
-    return criado
+    dados = crud_create_exportacao(db=db, registro=registro)
+    return dados

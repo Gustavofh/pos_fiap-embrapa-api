@@ -67,13 +67,14 @@ def update_producao(
         )
         registros.append(item)
 
-    criados = create_producoes(db=db, registros=registros)
-    return criados
+    dados = create_producoes(db=db, registros=registros)
+    return dados
 
 
 @router.get(
     "",
-    response_model=List[ProducaoOut]
+    response_model=List[ProducaoOut],
+    status_code=status.HTTP_200_OK
 )
 def read_producoes(
     produto: Optional[List[str]] = Query([], description="Produto(s) para filtrar"),
@@ -90,7 +91,7 @@ def read_producoes(
     """
     filtros_anos = ano if ano else None
 
-    registros = crud_get_producoes(
+    dados = crud_get_producoes(
         db=db,
         produtos=produto or None,
         tipos=tipo or None,
@@ -98,7 +99,12 @@ def read_producoes(
         quantidade_maxima=quantidadeMaxima,
         anos=filtros_anos
     )
-    return registros
+    if len(dados) != 0:
+        return dados
+    raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="Registros não encontrados. Altere os parametros de filtro."
+    )
 
 
 @router.post(
@@ -115,5 +121,5 @@ def create_producao_manual(
     - Recebe manualmente (JSON) um registro ProducaoBase e insere no banco.
     - Retorna o registro criado (com id).
     """
-    criado = crud_create_producao(db=db, registro=registro)
-    return criado
+    dados = crud_create_producao(db=db, registro=registro)
+    return dados
