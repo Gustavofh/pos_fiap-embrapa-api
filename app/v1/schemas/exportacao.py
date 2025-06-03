@@ -10,5 +10,7 @@ class ExportacaoBase(BaseModel):
 
 
 class ExportacaoOut(ExportacaoBase):
-    pass
+    id: int
 
+    class Config:
+        orm_mode = True

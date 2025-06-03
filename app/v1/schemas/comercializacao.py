@@ -9,6 +9,7 @@ class ComercializacaoBase(BaseModel):
 
 
 class ComercializacaoOut(ComercializacaoBase):
-    pass
+    id: int
 
-
+    class Config:
+        orm_mode = True

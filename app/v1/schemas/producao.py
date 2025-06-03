@@ -9,6 +9,7 @@ class ProducaoBase(BaseModel):
 
 
 class ProducaoOut(ProducaoBase):
-    pass
+    id: int
 
-
+    class Config:
+        orm_mode = True

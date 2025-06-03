@@ -10,5 +10,7 @@ class ProcessamentoBase(BaseModel):
 
 
 class ProcessamentoOut(ProcessamentoBase):
-    pass
+    id: int
 
+    class Config:
+        orm_mode = True

@@ -5,7 +5,11 @@ from app.v1.routes.comercializacao import router as comercializacao_router
 from app.v1.routes.importacao import router as importacao_router
 from app.v1.routes.exportacao import router as exportacao_router
 
-app = FastAPI(title="API de Produções")
+app = FastAPI(
+    title="Análises EMBRAPA",
+    description="Coleta para análise de dados históricos da Viniticultura da EMBRAPA",
+    version="1.0.0"
+)
 
 app.include_router(producao_router)
 app.include_router(processamento_router)
